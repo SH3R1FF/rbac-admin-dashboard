@@ -57,8 +57,7 @@ Before you begin, ensure you have the following installed:
 - React
 - Shadcn UI
 - Tailwind CSS
-- Zod (for validation)
-- React Hook Form
+- Next Themes
 
 ## Setup and Installation
 
@@ -73,53 +72,30 @@ cd rbac-project-ui
 npm install
 ```
 
-### Environment Configuration
-Create a `.env.local` file in the project root:
-```
-NEXT_PUBLIC_APP_NAME=RBAC Management
-NEXT_PUBLIC_DEBUG=true
-```
-
 ## Project Structure
 ```
 rbac-project-ui/
 │
 ├── app/
-│   ├── (auth)/
-│   │   ├── login/
-│   │   └── register/
-│   ├── (dashboard)/
-│   │   ├── users/
-│   │   └── roles/
+│   ├── thanks/
+│   │   ├── page.tsx
+│   ├── globals.css
+│   └── favicon.ico
 │   ├── layout.tsx
 │   └── page.tsx
 │
 ├── components/
 │   ├── ui/           # Shadcn UI components
-│   ├── users/
-│   │   ├── UserList.tsx
-│   │   ├── UserForm.tsx
-│   │   └── UserDetails.tsx
-│   ├── roles/
-│   │   ├── RoleList.tsx
-│   │   ├── RoleForm.tsx
-│   │   └── RolePermissions.tsx
-│   └── layout/
-│       ├── Sidebar.tsx
-│       └── Header.tsx
+│   ├── fireworks.tsx
+│   └── header.tsx
+│   ├── modeChange.tsx
+│   └── rbacDashboard.tsx
+│   └── themeProvider.tsx
 │
 ├── lib/
-│   ├── validations/
 │   ├── utils/
-│   └── constants/
-│
-├── types/
-│   ├── user.ts
-│   └── role.ts
 │
 ├── public/
-├── styles/
-│   └── globals.css
 │
 ├── next.config.js
 ├── tailwind.config.js
@@ -160,14 +136,8 @@ npm run format
 ```
 
 ## Security Considerations
-- Implement client-side validation using Zod
-- Use React Hook Form for secure form handling
 - Implement role-based access control in routing
 - Protect sensitive routes and components
-
-## State Management
-- Utilize React Context or Zustand for global state management
-- Implement lightweight, efficient state solutions
 
 ## Styling
 - Fully responsive design
@@ -177,8 +147,6 @@ npm run format
 ## Deployment
 Recommended Platforms:
 - Vercel (Recommended for Next.js)
-- Netlify
-- Cloudflare Pages
 
 Deployment Steps:
 1. Connect your GitHub repository
@@ -203,9 +171,11 @@ Deployment Steps:
 Distributed under the MIT License.
 
 ## Contact
-Your Name - your.email@example.com
+Himanshu Nageshwar - himanshunageshwar444@gmail.com
 
-Project Link: [https://github.com/your-username/rbac-project-ui](https://github.com/your-username/rbac-project-ui)
+Project Link: https://github.com/SH3R1FF/rbac-admin-dashboard
+
+Deployed APP - https://rbac-admin-dashboard-sh.vercel.app
 
 ## Recommended Extensions
 - ESLint
@@ -214,13 +184,4 @@ Project Link: [https://github.com/your-username/rbac-project-ui](https://github.
 - Path Intellisense
 ```
 
-Would you like me to elaborate on any specific section of the README or provide more detailed information about implementing the RBAC UI with Next.js and Shadcn UI?
-
-I can also help you with some initial component implementations or discuss the architecture in more depth if you're interested. Some key areas we could dive into include:
-1. Setting up role and user types
-2. Creating form validation schemas
-3. Implementing user and role management components
-4. Setting up access control logic
-5. Integrating Shadcn UI components
-
-What aspect would you like to explore further?
+THANKS
