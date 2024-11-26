@@ -30,9 +30,11 @@ import {
   Plus, 
   Trash2, 
   Check, 
-  X 
+  X,
+  Pencil
 } from 'lucide-react';
 import { toast } from 'sonner';
+
 
 // Define base types
 type UserStatus = 'active' | 'inactive';
@@ -54,7 +56,7 @@ interface Role {
   permissions: PermissionType[];
 }
 
-// Define interfaces for state management
+// Define interfaces for State management
 interface NewUser {
   name: string;
   email: string;
@@ -68,13 +70,28 @@ interface NewRole {
   permissions: PermissionType[];
 }
 
+interface EditingState {
+  userId: number | null;
+  field: 'status' | 'role' | null;
+}
+
 const RBACDashboard: React.FC = () => {
-  // Sample initial data with proper typing
+  
+  // Sample initial data with proper typing for User
+
   const [users, setUsers] = useState<User[]>([
     { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active' },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'editor', status: 'active' },
-    { id: 3, name: 'Bob Wilson', email: 'bob@example.com', role: 'viewer', status: 'inactive' },
+    { id: 3, name: 'Nathan Lyon', email: 'nathan@example.com', role: 'editor', status: 'inactive' },
+    { id: 4, name: 'Virat Kohli', email: 'virat@example.com', role: 'viewer', status: 'active' },
+    { id: 5, name: 'Rey Mysterio', email: 'rey@example.com', role: 'admin', status: 'active' },
+    { id: 6, name: 'Bob Wilson', email: 'bob@example.com', role: 'viewer', status: 'inactive' },
+    { id: 7, name: 'Ryan Renolds', email: 'ryan@example.com', role: 'viewer', status: 'active' },
+    { id: 8, name: 'Stan Lee', email: 'stan@example.com', role: 'admin', status: 'active' },
+    
   ]);
+
+   // Sample initial data with proper typing for Roles
 
   const [roles, setRoles] = useState<Role[]>([
     { 
@@ -97,13 +114,15 @@ const RBACDashboard: React.FC = () => {
     },
   ]);
 
+   // Sample initial data with proper typing for Permissions
+
   const [permissions] = useState<PermissionType[]>([
     'create', 'read', 'update', 'delete'
   ]);
 
   const [isAddingUser, setIsAddingUser] = useState<boolean>(false);
   const [isAddingRole, setIsAddingRole] = useState<boolean>(false);
-//   const [editingRole, setEditingRole] = useState<number | null>(null);
+  const [editing, setEditing] = useState<EditingState>({ userId: null, field: null });
   const [newUser, setNewUser] = useState<NewUser>({ 
     name: '', 
     email: '', 
@@ -116,6 +135,7 @@ const RBACDashboard: React.FC = () => {
     permissions: [] 
   });
 
+  // To Add User
   const addUser = (): void => {
     setUsers([...users, { id: users.length + 1, ...newUser }]);
     setNewUser({ name: '', email: '', role: '', status: 'active' });
@@ -123,6 +143,7 @@ const RBACDashboard: React.FC = () => {
     toast("User has been added.")
   };
 
+   // To Add Role
   const addRole = (): void => {
     setRoles([...roles, { id: roles.length + 1, ...newRole }]);
     setNewRole({ name: '', description: '', permissions: [] });
@@ -130,15 +151,21 @@ const RBACDashboard: React.FC = () => {
     toast("Role has been added.")
   };
 
+   // To Delete User
+
   const deleteUser = (id: number): void => {
     setUsers(users.filter(user => user.id !== id));
     toast("User has been deleted.")
   };
 
+  // To Delete Role
+
   const deleteRole = (id: number): void => {
     setRoles(roles.filter(role => role.id !== id));
     toast("Role has been deleted.")
   };
+
+  // To Toggle Permission
 
   const togglePermission = (roleId: number, permission: PermissionType): void => {
     setRoles(roles.map(role => {
@@ -152,115 +179,197 @@ const RBACDashboard: React.FC = () => {
     }));
   };
 
+
+  // To Edit Status and Role
+
+  const startEditing = (userId: number, field: 'status' | 'role') => {
+    setEditing({ userId, field });
+  };
+
+
+  // To Update User
+
+  const updateUser = (userId: number, field: 'status' | 'role', value: string) => {
+    setUsers(users.map(user => {
+      if (user.id === userId) {
+        return { ...user, [field]: value };
+      }
+      return user;
+    }));
+    setEditing({ userId: null, field: null });
+    toast(`User ${field} has been updated.`);
+  };
+
+  const renderEditableField = (user: User, field: 'status' | 'role') => {
+    const isEditing = editing.userId === user.id && editing.field === field;
+
+    if (!isEditing) {
+      return (
+        <div className="flex items-center space-x-2">
+          <Badge 
+            variant={field === 'status' ? (user[field] === 'active' ? 'default' : 'destructive') : 'secondary'}
+            // className={field === 'role' ? 'dark:bg-blue-600 bg-blue-400' : ''}
+            className={field === 'role' ? (user[field] === 'admin' ? 'dark:bg-blue-600 bg-blue-400' : '') : "secondary"}
+          >
+            {user[field]}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => startEditing(user.id, field)}
+            className="h-6 w-6"
+          >
+            <Pencil className="h-3 w-3" />
+          </Button>
+        </div>
+      );
+    }
+
+    if (field === 'status') {
+      return (
+        <div className="flex items-center space-x-2">
+          <select
+            className="p-1 border rounded text-sm"
+            value={user.status}
+            onChange={(e) => updateUser(user.id, 'status', e.target.value)}
+            autoFocus
+          >
+            <option value="active">active</option>
+            <option value="inactive">inactive</option>
+          </select>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center space-x-2">
+        <select
+          className="p-1 border rounded text-sm"
+          value={user.role}
+          onChange={(e) => updateUser(user.id, 'role', e.target.value)}
+          autoFocus
+        >
+          {roles.map(role => (
+            <option key={role.id} value={role.name}>{role.name}</option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
-    <h1 className="text-3xl font-bold mb-6">RBAC Admin Dashboard</h1>
-    
-    <Tabs defaultValue="users" className="space-y-4">
-      <TabsList>
-        <TabsTrigger value="users">Users</TabsTrigger>
-        <TabsTrigger value="roles">Roles</TabsTrigger>
-      </TabsList>
+      <h1 className="text-3xl font-bold mb-6">RBAC Admin Dashboard</h1>
+      
+      <Tabs defaultValue="users" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="roles">Roles</TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="users">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>Manage system users and their roles</CardDescription>
-              </div>
-              <Dialog open={isAddingUser} onOpenChange={setIsAddingUser}>
-                <DialogTrigger asChild>
-                  <Button className='dark:bg-blue-600 dark:text-white'>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add User
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New User</DialogTitle>
-                    <DialogDescription>Create a new user account</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Input
-                        placeholder="Name"
-                        value={newUser.name}
-                        onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Input
-                        placeholder="Email"
-                        type="email"
-                        value={newUser.email}
-                        onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <select
-                        className="w-full p-2 border rounded"
-                        value={newUser.role}
-                        onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                      >
-                        <option value="">Select Role</option>
-                        {roles.map(role => (
-                          <option key={role.id} value={role.name}>{role.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <Button className='dark:bg-blue-600 dark:text-white' onClick={addUser} >Add User</Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b ">
-                    <th className="text-left p-4 font-bold">Name</th>
-                    <th className="text-left p-4 font-bold">Email</th>
-                    <th className="text-left p-4 font-bold">Role</th>
-                    <th className="text-left p-4 font-bold">Status</th>
-                    <th className="text-left p-4 font-bold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(user => (
-                    <tr key={user.id} className="border-b hover:bg-gray-50 dark:hover:bg-neutral-900">
-                      <td className="p-4">{user.name}</td>
-                      <td className="p-4 text-neutral-400">{user.email}</td>
-                      <td className="p-4">
-                        <Badge variant="secondary" className='dark:bg-blue-600 bg-blue-400'>{user.role}</Badge>
-                      </td>
-                      <td className="p-4">
-                        <Badge variant={user.status === 'active' ? 'default' : 'destructive'}>
-                          {user.status}
-                        </Badge>
-                      </td>
-                      <td className="p-4">
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => deleteUser(user.id)}
+        {/* Users tab content */}
+
+        <TabsContent value="users">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>User Management</CardTitle>
+                  <CardDescription>Manage system users and their roles</CardDescription>
+                </div>
+                <Dialog open={isAddingUser} onOpenChange={setIsAddingUser}>
+                  <DialogTrigger asChild>
+                    <Button className='dark:bg-blue-600 dark:text-white'>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add User
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New User</DialogTitle>
+                      <DialogDescription>Create a new user account</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Name"
+                          value={newUser.name}
+                          onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Email"
+                          type="email"
+                          value={newUser.email}
+                          onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+
+                        <select
+                          className="w-full p-2 border rounded"
+                          value={newUser.role}
+                          onChange={(e) => setNewUser({...newUser, role: e.target.value})}
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
+                          <option value="">Select Role</option>
+                          {roles.map(role => (
+                            <option key={role.id} value={role.name}>{role.name}</option>
+                          ))}
+                        </select>
 
-      <TabsContent value="roles">
-        <Card>
+                      </div>
+                      <Button className='dark:bg-blue-600 dark:text-white' onClick={addUser}>Add User</Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-4 font-bold">Name</th>
+                      <th className="text-left p-4 font-bold">Email</th>
+                      <th className="text-left p-4 font-bold">Role</th>
+                      <th className="text-left p-4 font-bold">Status</th>
+                      <th className="text-left p-4 font-bold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map(user => (
+                      <tr key={user.id} className="border-b hover:bg-gray-50 dark:hover:bg-neutral-900">
+                        <td className="p-4">{user.name}</td>
+                        <td className="p-4 text-neutral-400">{user.email}</td>
+                        <td className="p-4">
+                          {renderEditableField(user, 'role')}
+                        </td>
+                        <td className="p-4">
+                          {renderEditableField(user, 'status')}
+                        </td>
+                        <td className="p-4">
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => deleteUser(user.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Roles tab content */}
+
+        <TabsContent value="roles">
+          <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
@@ -372,8 +481,8 @@ const RBACDashboard: React.FC = () => {
           </CardContent>
         </Card>
       </TabsContent>
-    </Tabs>
-  </div>
+      </Tabs>
+    </div>
   );
 };
 

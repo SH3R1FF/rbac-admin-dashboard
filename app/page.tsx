@@ -3,13 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 export default function Home() {
   return (
-    <div>
+    <div className="">
       <RBACDashboard/>
       <div className="p-10 max-w-6xl mx-auto">
         <div className="flex max-sm:flex-col gap-3 items-center justify-between">
           <Link href={"/thanks"} className="text-blue-500 hover:text-blue-700 underline underline-offset-4">Thank You</Link>
           <div className="flex items-center gap-2">
-            <p className="text-sm">
+            <p className="text-xs lg:text-sm">
               Designed and Developed By
             </p>
             <span className="flex items-center gap-2 w-fit p-1 rounded-lg hover:-translate-y-1 transition-all">
@@ -20,7 +20,7 @@ export default function Home() {
                 width={20}
                 height={20}
               />
-              <Link href="https://him4nshu.vercel.app" target="_blank" className="text-blue-500 hover:text-blue-700 underline underline-offset-4 text-sm ">
+              <Link href="https://him4nshu.vercel.app" target="_blank" className="text-blue-500 hover:text-blue-700 underline underline-offset-4 text-xs lg:text-sm ">
                 Himanshu
               </Link>
             </span>
