@@ -147,17 +147,6 @@ const RBACDashboard: React.FC = () => {
 
   // Filtered and Searched Users
 
-  // const filteredUsers = useMemo(() => {
-  //   return users.filter(user => {
-  //     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-  //                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
-  //     const matchesRole = !roleFilter || user.role === roleFilter;
-  //     const matchesStatus = !statusFilter || user.status === statusFilter;
-      
-  //     return matchesSearch && matchesRole && matchesStatus;
-  //   });
-  // }, [users, searchTerm, roleFilter, statusFilter]);
-
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -248,31 +237,41 @@ const RBACDashboard: React.FC = () => {
     if (field === 'status') {
       return (
         <div className="flex items-center space-x-2">
-          <select
-            className="p-1 border rounded text-sm"
-            value={user.status}
-            onChange={(e) => updateUser(user.id, 'status', e.target.value)}
-            autoFocus
+          <Select 
+            value={user.status}      
+            onValueChange={(e) => updateUser(user.id, 'status', e)}         
           >
-            <option value="active">active</option>
-            <option value="inactive">inactive</option>
-          </select>
+            <SelectTrigger className="p-1 border rounded text-sm w-[100px]">
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>        
+                <SelectItem value="active">active</SelectItem>
+                <SelectItem value="inactive">inactive</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
       );
     }
 
     return (
       <div className="flex items-center space-x-2">
-        <select
-          className="p-1 border rounded text-sm"
-          value={user.role}
-          onChange={(e) => updateUser(user.id, 'role', e.target.value)}
-          autoFocus
-        >
-          {roles.map(role => (
-            <option key={role.id} value={role.name}>{role.name}</option>
-          ))}
-        </select>
+          <Select 
+            value={user.role}     
+            onValueChange={(e) => updateUser(user.id, 'role', e)}          
+          >
+            <SelectTrigger className="p-1 border rounded text-sm w-[90px]">
+              <SelectValue placeholder="Select Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {roles.map(role => (
+                  <SelectItem key={role.id} value={role.name}>{role.name}</SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
       </div>
     );
   };
@@ -281,7 +280,7 @@ const RBACDashboard: React.FC = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">RBAC Admin Dashboard</h1>
       
-      <Tabs defaultValue="users" className="space-y-4">
+      <Tabs defaultValue="users" className="space-y-8 ">
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="roles">Roles</TabsTrigger>
@@ -294,11 +293,11 @@ const RBACDashboard: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>User Management</CardTitle>
-                  <CardDescription>Manage system users and their roles</CardDescription>
+                  <CardDescription className='max-sm:text-xs'>Manage system users and their roles</CardDescription>
                 </div>
                 <Dialog open={isAddingUser} onOpenChange={setIsAddingUser}>
                   <DialogTrigger asChild>
-                    <Button className='dark:bg-blue-600 dark:text-white'>
+                    <Button className='dark:bg-blue-600 dark:text-white lg:text-sm text-xs'>
                       <Plus className="w-4 h-4 mr-2" />
                       Add User
                     </Button>
@@ -326,16 +325,21 @@ const RBACDashboard: React.FC = () => {
                       </div>
                       <div className="space-y-2">
 
-                        <select
-                          className="w-full p-2 border rounded"
-                          value={newUser.role}
-                          onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                        <Select 
+                          value={newUser.role}        
+                          onValueChange={(e) => setNewUser({...newUser, role: e})}
                         >
-                          <option value="">Select Role</option>
-                          {roles.map(role => (
-                            <option key={role.id} value={role.name}>{role.name}</option>
+                          <SelectTrigger className="w-full p-2 border rounded">
+                            <SelectValue placeholder="Select Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                            {roles.map(role => (
+                            <SelectItem key={role.id} value={role.name}>{role.name}</SelectItem>
                           ))}
-                        </select>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
 
                       </div>
                       <Button className='dark:bg-blue-600 dark:text-white' onClick={addUser}>Add User</Button>
@@ -346,54 +350,60 @@ const RBACDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               {/* Search and Filter Section */}
-              <div className="flex space-x-4 mb-4">
-                <div className="relative flex-grow">
-                  <Input 
-                    placeholder="Search users..." 
+              {/* <div className="flex space-x-4 mb-4"> */}
+              <div className="grid lg:grid-cols-3 grid-cols-1 mb-4 gap-5">
+                {/* <div className="relative flex-grow w-full"> */}
+                <div className="flex items-center border rounded-md px-2">
+                  <Search className="text-muted-foreground h-4 w-4"/>
+                  <Input
+                    placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className=" border-none outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                    aria-label="Search users"
                   />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 </div>
                 
-                <Select 
-            value={roleFilter} 
-            onValueChange={setRoleFilter}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Role - " />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Roles</SelectLabel>
-                <SelectItem value='All'>All</SelectItem>
-                {roles.map(role => (
-                  <SelectItem key={role.id} value={role.name}>
-                    {role.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+                <div>
+                  <Select 
+                    value={roleFilter} 
+                    onValueChange={setRoleFilter}
+                    >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Filter by Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Roles</SelectLabel>
+                        <SelectItem value='All'>All</SelectItem>
+                        {roles.map(role => (
+                          <SelectItem key={role.id} value={role.name}>
+                            {role.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <Select 
-                  value={statusFilter} 
-                  onValueChange={setStatusFilter}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by Status -  " />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                    <SelectLabel>Status</SelectLabel>
-                      <SelectItem value='All'>All</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
+                <div>
+                  <Select 
+                    value={statusFilter} 
+                    onValueChange={setStatusFilter}
+                    >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Filter by Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                      <SelectLabel>Status</SelectLabel>
+                        <SelectItem value='All'>All</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               
               </div>
 
@@ -449,11 +459,11 @@ const RBACDashboard: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>Role Management</CardTitle>
-                  <CardDescription>Define and manage role permissions</CardDescription>
+                  <CardDescription className='max-sm:text-xs'>Define and manage role permissions</CardDescription>
                 </div>
                 <Dialog open={isAddingRole} onOpenChange={setIsAddingRole}>
                   <DialogTrigger asChild>
-                    <Button className='dark:bg-blue-600 dark:text-white'>
+                    <Button className='dark:bg-blue-600 dark:text-white lg:text-sm text-xs'>
                       <Plus className="w-4 h-4 mr-2" />
                       Add Role
                     </Button>
