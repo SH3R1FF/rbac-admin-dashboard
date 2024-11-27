@@ -147,16 +147,28 @@ const RBACDashboard: React.FC = () => {
 
   // Filtered and Searched Users
 
+  // const filteredUsers = useMemo(() => {
+  //   return users.filter(user => {
+  //     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  //                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
+  //     const matchesRole = !roleFilter || user.role === roleFilter;
+  //     const matchesStatus = !statusFilter || user.status === statusFilter;
+      
+  //     return matchesSearch && matchesRole && matchesStatus;
+  //   });
+  // }, [users, searchTerm, roleFilter, statusFilter]);
+
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                             user.email.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesRole = !roleFilter || user.role === roleFilter;
-      const matchesStatus = !statusFilter || user.status === statusFilter;
-      
+      const matchesRole = !roleFilter || roleFilter === 'All' || user.role === roleFilter;
+      const matchesStatus = !statusFilter || statusFilter === 'All' || user.status === statusFilter;
+  
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [users, searchTerm, roleFilter, statusFilter]);
+  
 
   const addUser = (): void => {
     setUsers([...users, { id: users.length + 1, ...newUser }]);
@@ -355,7 +367,7 @@ const RBACDashboard: React.FC = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Roles</SelectLabel>
-                <SelectItem>All</SelectItem>
+                <SelectItem value='All'>All</SelectItem>
                 {roles.map(role => (
                   <SelectItem key={role.id} value={role.name}>
                     {role.name}
@@ -375,12 +387,14 @@ const RBACDashboard: React.FC = () => {
                   <SelectContent>
                     <SelectGroup>
                     <SelectLabel>Status</SelectLabel>
-                      <SelectItem>All</SelectItem>
+                      <SelectItem value='All'>All</SelectItem>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+
+              
               </div>
 
               <div className="overflow-x-auto">
